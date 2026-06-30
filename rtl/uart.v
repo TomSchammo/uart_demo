@@ -38,46 +38,51 @@ module uart (
       if (baud_counter == 8'd234) begin
         baud_counter <= 8'd0;
 
-        if (state == START) begin
-          uart_tx <= 1'b0;
-          state <= DATA;
 
-        end else if (state == DATA) begin
-          // has one window been sent
-          if (bit_counter == 3'd7) begin
-            uart_tx <= counter[bit_index];
-            bit_index <= bit_index + 1'b1;
-            bit_counter <= 3'd0;
-            state <= STOP;
-          end else begin
-            uart_tx <= counter[bit_index];
-            bit_counter <= bit_counter + 1'b1;
-            bit_index <= bit_index + 1'b1;
+
+        case (state)
+          START: begin
+            uart_tx <= 1'b0;
+            state <= DATA;
           end
+          DATA: begin
+            // has one window been sent
+            if (bit_counter == 3'd7) begin
+              uart_tx <= counter[bit_index];
+              bit_index <= bit_index + 1'b1;
+              bit_counter <= 3'd0;
+              state <= STOP;
+            end else begin
+              uart_tx <= counter[bit_index];
+              bit_counter <= bit_counter + 1'b1;
+              bit_index <= bit_index + 1'b1;
+            end
+          end
+          STOP: begin
+            uart_tx <= 1'b1;
 
-        end else if (state == STOP) begin
-          uart_tx <= 1'b1;
-
-          // continue transmitting
-          if (bit_index != 4'b0) begin
+            // continue transmitting
+            if (bit_index != 4'b0) begin
+              state <= START;
+            end else begin
+              // led[3] <= 1'b0;
+              state <= IDLE;
+              // NOTE: this branch is never reached
+            end
+          end
+          IDLE: begin
+            // led[4] <= 1'b0;
+            if (counter == 16'hffff) begin
+              counter <= 16'b0;
+            end else begin
+              counter <= counter + 1'b1;
+            end
             state <= START;
-          end else begin
-            // led[3] <= 1'b0;
-            state <= IDLE;
-            // NOTE: this branch is never reached
           end
-        end else if (state == IDLE) begin
-          // led[4] <= 1'b0;
-          if (counter == 16'hffff) begin
-            counter <= 16'b0;
-          end else begin
-            counter <= counter + 1'b1;
+          default: begin
+            // this should be unreachable
           end
-          state <= START;
-        end else begin
-          // this should be unreachable
-          // led[5] <= 1'b0;
-        end
+        endcase
       end
     end
 
