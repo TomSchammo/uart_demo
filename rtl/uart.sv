@@ -1,21 +1,22 @@
 module uart (
+    input logic rst,
     input  logic       clk,   // 27 MHz oscillator, pin 4
-    output logic [5:0] led = 6'b111111,    // 6 onboard LEDs (active-low), pins 15-20
-    output logic uart_tx = 1'b1
+    output logic [5:0] led,    // 6 onboard LEDs (active-low), pins 15-20
+    output logic uart_tx
 );
 
-    logic [7:0] baud_counter = 8'd0;
+    logic [7:0] baud_counter;
 
     // transmit 16 bit words
-    logic [15:0] counter = 16'd0;
-    logic [3:0] bit_index = 4'd0;
+    logic [15:0] counter;
+    logic [3:0] bit_index;
 
     // send 8 bits per window
-    logic [2:0] bit_counter = 3'd0;
+    logic [2:0] bit_counter;
 
     typedef enum logic [1:0] {IDLE, START, DATA, STOP} state_t;
 
-    state_t state = START;
+    state_t state;
 
     // assign led[0] = 1'b0;
     // assign led[2] = 1'b0;
@@ -23,13 +24,23 @@ module uart (
     // assign led[4] = 1'b0;
 
 
-    always_ff @(posedge clk) begin
-      baud_counter <= baud_counter + 1'b1;
 
-      if (baud_counter == 8'd234) begin
+    always_ff @(posedge clk or posedge rst) begin
+      if (rst) begin
         baud_counter <= 8'd0;
+        counter      <= 16'd0;
+        bit_index    <= 4'd0;
+        bit_counter  <= 3'd0;
+        state        <= START;
+        uart_tx      <= 1'b1;
+        led          <= 6'b111111;
+      end else begin
+        baud_counter <= baud_counter + 1'b1;
 
-        unique case (state)
+        if (baud_counter == 8'd234) begin
+          baud_counter <= 8'd0;
+
+          unique case (state)
           START: begin
             uart_tx <= 1'b0;
             state <= DATA;
@@ -69,6 +80,7 @@ module uart (
         endcase
       end
     end
+  end
 
 
     // assign led = ~counter[5:0];  // active-low: invert so LEDs count visibly
