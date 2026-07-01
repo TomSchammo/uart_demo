@@ -80,6 +80,7 @@ module uart (
             state <= START;
           end
           default: begin
+            led[5] <= 1'b0;
             // this should be unreachable
           end
         endcase
