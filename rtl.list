@@ -1,2 +1,2 @@
 # synthesis sources, in order. one file per line, '#' for comments.
-rtl/uart.v
+rtl/uart.sv
