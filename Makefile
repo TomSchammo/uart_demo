@@ -19,7 +19,7 @@ BIT  := $(BUILD)/$(TOP).fs
 all: $(BIT)
 
 $(JSON): $(SRCS) $(FILELIST) | $(BUILD)
-	yosys -p "read_verilog $(SRCS); synth_gowin -top $(TOP) -json $@"
+	yosys -p "read_verilog -sv $(SRCS); synth_gowin -top $(TOP) -json $@"
 
 $(PNR): $(JSON) $(CST)
 	nextpnr-himbaechel \
