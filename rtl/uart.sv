@@ -1,15 +1,8 @@
 module uart (
     input  logic       clk,   // 27 MHz oscillator, pin 4
-    output logic [5:0] led,    // 6 onboard LEDs (active-low), pins 15-20
-    output logic uart_tx
+    output logic [5:0] led = 6'b111111,    // 6 onboard LEDs (active-low), pins 15-20
+    output logic uart_tx = 1'b1
 );
-
-
-    initial begin
-      led = 6'b111111;
-      uart_tx = 1'b1;
-    end
-
 
     logic [7:0] baud_counter = 8'd0;
 
@@ -36,24 +29,21 @@ module uart (
       if (baud_counter == 8'd234) begin
         baud_counter <= 8'd0;
 
-
-
         unique case (state)
           START: begin
             uart_tx <= 1'b0;
             state <= DATA;
           end
           DATA: begin
+            uart_tx <= counter[bit_index];
+            bit_index <= bit_index + 1'b1;
+
             // has one window been sent
             if (bit_counter == 3'd7) begin
-              uart_tx <= counter[bit_index];
-              bit_index <= bit_index + 1'b1;
               bit_counter <= 3'd0;
               state <= STOP;
             end else begin
-              uart_tx <= counter[bit_index];
               bit_counter <= bit_counter + 1'b1;
-              bit_index <= bit_index + 1'b1;
             end
           end
           STOP: begin
@@ -65,7 +55,6 @@ module uart (
             end else begin
               // led[3] <= 1'b0;
               state <= IDLE;
-              // NOTE: this branch is never reached
             end
           end
           IDLE: begin
