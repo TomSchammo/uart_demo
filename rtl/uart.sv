@@ -70,11 +70,7 @@ module uart (
           end
           IDLE: begin
             // led[4] <= 1'b0;
-            if (counter == 16'hffff) begin
-              counter <= 16'b0;
-            end else begin
-              counter <= counter + 1'b1;
-            end
+            counter <= counter + 1'b1;
             state <= START;
           end
         endcase
