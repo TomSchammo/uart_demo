@@ -10,6 +10,7 @@ module uart (
     // transmit 16 bit words
     logic [15:0] counter;
     logic [3:0] bit_index;
+    logic [15:0] idle_counter;
 
     // send 8 bits per window
     logic [2:0] bit_counter;
@@ -34,7 +35,11 @@ module uart (
         state        <= START;
         uart_tx      <= 1'b1;
         led          <= 6'b111111;
+        idle_counter <= 16'd0;
+        led[0]       <= 1'b0;
+        led[5]       <= 1'b1;
       end else begin
+        led[0]       <= 1'b1;
         baud_counter <= baud_counter + 1'b1;
 
         if (baud_counter == 8'd234) begin
@@ -69,9 +74,12 @@ module uart (
             end
           end
           IDLE: begin
-            // led[4] <= 1'b0;
-            counter <= counter + 1'b1;
-            state <= START;
+            idle_counter <= idle_counter + 1'b1;
+            if (idle_counter == 16'hffff) begin
+              led[5]       <= ~led[5];
+              counter <= counter + 1'b1;
+              state <= START;
+            end
           end
         endcase
       end
