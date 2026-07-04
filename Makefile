@@ -14,9 +14,18 @@ JSON := $(BUILD)/$(TOP).json
 PNR  := $(BUILD)/$(TOP)_pnr.json
 BIT  := $(BUILD)/$(TOP).fs
 
+# ---- host receiver ----
+CC     ?= cc
+CFLAGS += -Wall -Wextra -O2
+CSRC   := src/uart.c
+RECV   := $(BUILD)/uart_recv
+
 # ---- flow ----
 .PHONY: all flash flash-spi clean
-all: $(BIT)
+all: $(BIT) $(RECV)
+
+$(RECV): $(CSRC) | $(BUILD)
+	$(CC) $(CFLAGS) -o $@ $<
 
 $(JSON): $(SRCS) $(FILELIST) | $(BUILD)
 	yosys -p "read_verilog -sv $(SRCS); synth_gowin -top $(TOP) -json $@"
