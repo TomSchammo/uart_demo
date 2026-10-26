@@ -1,17 +1,25 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <termios.h>
 #include <unistd.h>
 
-#define DEVICE "/dev/cu.usbserial-20250303171"
+int main(int argc, char **argv) {
 
-int main(void) {
+  if (argc != 2) {
+    puts("invalid number of command line arguments, expected a device path");
+    return EXIT_FAILURE;
+  }
 
-  int fd = open(DEVICE, O_RDONLY | O_NOCTTY);
+  const char *device = argv[1];
+
+  int fd = open(device, O_RDONLY | O_NOCTTY);
   if (fd < 0) {
-    perror("open " DEVICE);
+    int e = errno;
+    fprintf(stderr, "open %s: %s\n", device, strerror(e));
     return EXIT_FAILURE;
   }
 
