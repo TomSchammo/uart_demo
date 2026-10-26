@@ -32,9 +32,15 @@ make flash
 make flash-spi
 ```
 
-# Accessing Serial
+# Reading the Output
+
+The output can be read using screen with the following command where the device path can be found using `ls /dev/cu.usbserial-*`.
 
 ```bash
-screen /dev/cu.usbserial-20250303171 115200
+screen <device path> 115200
 ```
 
+But as screen reads characters but the FPGA sends raw numbers, the output will look like garbage.
+To get a more readable output, an accompanying C program has been developed that prints the 16-bit numbers.
+
+It can be run using `./build/uart_recv <device path>`.
