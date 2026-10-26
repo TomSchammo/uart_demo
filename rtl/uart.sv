@@ -34,10 +34,8 @@ module uart (
         bit_counter  <= 3'd0;
         state        <= START;
         uart_tx      <= 1'b1;
-        led          <= 6'b111111;
+        led          <= 6'b111110;
         idle_counter <= 16'd0;
-        led[0]       <= 1'b0;
-        led[5]       <= 1'b1;
       end else begin
         led[0]       <= 1'b1;
         baud_counter <= baud_counter + 1'b1;
