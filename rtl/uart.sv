@@ -19,6 +19,9 @@ module uart (
 
     state_t state;
 
+    initial state = START;
+    initial uart_tx = 1'b1;
+
 
     always_ff @(posedge clk or posedge rst) begin
       if (rst) begin
