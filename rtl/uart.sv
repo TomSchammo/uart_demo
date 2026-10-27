@@ -19,12 +19,6 @@ module uart (
 
     state_t state;
 
-    // assign led[0] = 1'b0;
-    // assign led[2] = 1'b0;
-    // assign led[3] = 1'b0;
-    // assign led[4] = 1'b0;
-
-
 
     always_ff @(posedge clk or posedge rst) begin
       if (rst) begin
@@ -67,7 +61,6 @@ module uart (
             if (bit_index != 4'b0) begin
               state <= START;
             end else begin
-              // led[3] <= 1'b0;
               state <= IDLE;
             end
           end
@@ -84,8 +77,4 @@ module uart (
     end
   end
 
-
-    // assign led = ~counter[5:0];  // active-low: invert so LEDs count visibly
-    // assign led = ~counter[15:10];  // active-low: invert so LEDs count visibly
-    // assign led = counter[25:20];
 endmodule
